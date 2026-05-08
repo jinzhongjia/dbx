@@ -1,0 +1,49 @@
+# Maintainer: jinzhongjia <jinzhongjia@manus.ai>
+pkgname=dbx-bin
+_pkgname=dbx
+pkgver=0.4.3
+pkgrel=1
+pkgdesc="Open-source database management tool (Tauri-based) — prebuilt binary"
+arch=('x86_64')
+url="https://github.com/t8y2/dbx"
+license=('AGPL-3.0-only')
+depends=(
+    'webkit2gtk-4.1'
+    'gtk3'
+    'sqlite'
+    'unixodbc'
+    'openssl'
+    'hicolor-icon-theme'
+)
+provides=("$_pkgname")
+conflicts=("$_pkgname")
+source=(
+    "$pkgname-$pkgver.deb::$url/releases/download/v$pkgver/DBX_${pkgver}_amd64.deb"
+    "LICENSE-$pkgver::$url/raw/v$pkgver/LICENSE"
+)
+sha256sums=(
+    '654297e04ecc794baf160c4a19da134c059d5bbcbb619481c6ba9175fb275605'
+    '0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0'
+)
+options=('!strip' '!emptydirs' '!debug')
+
+package() {
+    # Tauri's .deb is a regular debian archive: ar(1) wrapping
+    # debian-binary + control.tar.* + data.tar.*. Extract data straight
+    # into $pkgdir.
+    local deb="$srcdir/$pkgname-$pkgver.deb"
+    mkdir -p "$srcdir/extract" && cd "$srcdir/extract"
+    bsdtar -xf "$deb"
+    bsdtar -xf data.tar.* -C "$pkgdir/"
+
+    # Tauri ships icons under a non-standard `256x256@2` directory; rename
+    # it to the conventional `512x512` so hicolor picks it up.
+    if [ -d "$pkgdir/usr/share/icons/hicolor/256x256@2" ]; then
+        mv "$pkgdir/usr/share/icons/hicolor/256x256@2" \
+           "$pkgdir/usr/share/icons/hicolor/512x512"
+    fi
+
+    # AGPL: ship the upstream LICENSE alongside the binary.
+    install -Dm644 "$srcdir/LICENSE-$pkgver" \
+        "$pkgdir/usr/share/licenses/$_pkgname/LICENSE"
+}

@@ -36,3 +36,12 @@ tmp/
 
 # Logs
 *.log
+/packaging/arch/pkg
+/packaging/arch/src
+/packaging/arch/*.tar.zst
+/packaging/arch/*.tar.gz
+/packaging/arch/dbx-bin/pkg/dbx-bin
+/packaging/arch/dbx-bin/src
+/packaging/arch/dbx-bin/*.tar.zst
+/packaging/arch/dbx-bin/*.deb
+/packaging/arch/dbx-bin/LICENSE-*
